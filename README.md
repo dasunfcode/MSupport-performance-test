@@ -18,7 +18,7 @@ cd MSUPPORT-performance-test
 2. Run the sample script:
 
 ```powershell
-k6 run sample.js
+k6 run tests/sample.js
 ```
 
 3. You should see output like:
