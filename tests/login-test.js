@@ -1,16 +1,24 @@
 import http from 'k6/http';
-import { check } from 'k6';
+import { check, sleep, open } from 'k6';
+
+// This test logs each user directly; it intentionally does **not** import the
+// shared `generateTokenPool` helper because it's the one exception to running
+// the token-generation step at startup.
+const usersData = JSON.parse(open('../data/test_users.json'));
 
 export const options = {
-  vus: 10,        // 10 virtual users
-  duration: '1m',  // run test for 1 minutes
+  vus: 100,        // 100 virtual users
+  duration: '2m',  // test duration
 };
 
 export default function () {
 
+  // Each VU gets a unique user
+  const user = usersData[(__VU - 1) % usersData.length];
+
   const payload = JSON.stringify({
-    email: "dasuntest5@gmail.com",
-    password: "Ddh@sivalicc*99"
+    email: user.email,
+    password: user.password
   });
 
   const params = {
@@ -21,14 +29,16 @@ export default function () {
   };
 
   const res = http.post(
-    'https://uat.msupport.mone.am/api/v1/auth/login',
+    'https://qa.msupport.mone.am/api/v1/auth/login',
     payload,
     params
   );
 
   check(res, {
-    'login succeeded': (r) => r.status === 200,
+    'login successful': (r) => r.status === 200,
   });
 
-  console.log(`VU ${__VU} LOGIN STATUS: ${res.status}`);
+  console.log(`VU ${__VU} logged in with ${user.email} - status: ${res.status}`);
+
+  sleep(1);
 }
