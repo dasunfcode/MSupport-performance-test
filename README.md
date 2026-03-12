@@ -1,43 +1,61 @@
+---
+
 # MSupport Load Test Framework
 
 A simple K6-based load testing framework for the MSupport API. Designed to simulate user logins and API requests under load.
 
+---
+
 ##  Quick Start
 
-1. **Clone the repository:**
+### 1. Install prerequisites
 
-```bash
+**Install Chocolatey (Windows)**
+
+```powershell id="choco-install"
+Set-ExecutionPolicy Bypass -Scope Process -Force; `
+[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
+iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+```
+
+**Install K6**
+
+```bash id="k6-install"
+choco install k6
+```
+
+---
+
+### 2. Clone the repository
+
+```bash id="repo-clone"
 git clone <repository-url>
 cd MSupport-performance-test
-npm install
 ```
 
-2. **Run a basic test:**
+---
 
-```bash
+### 3. Run basic tests
+
+```bash id="run-sample"
 k6 run sample.js
-```
-
-3. **Run login test:**
-
-```bash
 k6 run tests/login-test.js
 ```
 
-4. **Run organization search test:**
+**Override options if needed:**
 
-```bash
-k6 run tests/organizations-search-test.js
+```bash id="run-custom"
+k6 run -e VUS=50 -e DURATION=5m tests/organizations-search-test.js
 ```
 
 ---
 
 ##  Repository Structure
 
-```
+```id="repo-structure"
 MSupport-performance-test/
 ├── config/                  # Config files
-├── data/
+├── data/    
 ├── scripts/                 # Token generation utilities
 ├── tests/                   # Test scripts (login, search, etc.)
 ├── sample.js                # Example K6 test
@@ -57,7 +75,7 @@ MSupport-performance-test/
 
 ### Use Tokens in Tests
 
-```javascript
+```javascript id="tokens-usage"
 export function setup() {
     return generateTokenPool(users); // Generates token pool
 }
@@ -72,26 +90,8 @@ export default function(tokens) {
 
 ### Generate Tokens Standalone
 
-```bash
+```bash id="generate-tokens"
 k6 run scripts/generate_tokens.js
-```
-
----
-
-##  Running Tests
-
-```bash
-# Login test
-k6 run tests/login-test.js
-
-# Organization search test
-k6 run tests/organizations-search-test.js
-```
-
-Override options:
-
-```bash
-k6 run -e VUS=50 -e DURATION=5m tests/organizations-search-test.js
 ```
 
 ---
@@ -101,7 +101,7 @@ k6 run -e VUS=50 -e DURATION=5m tests/organizations-search-test.js
 1. Create a new file in `tests/`.
 2. Import modules:
 
-```javascript
+```javascript id="new-test-import"
 import http from 'k6/http';
 import { check } from 'k6';
 import { generateTokenPool } from '../scripts/generate_tokens.js';
@@ -111,15 +111,15 @@ import { generateTokenPool } from '../scripts/generate_tokens.js';
 4. Implement API calls in `default()`.
 5. Add checks:
 
-```javascript
+```javascript id="new-test-check"
 check(res, { 'status is 200': (r) => r.status === 200 });
 ```
 
 ---
 
-## ⚙️ Customizing Load
+##  Customizing Load
 
-```javascript
+```javascript id="custom-load"
 export const options = {
     vus: 10,
     duration: '2m'
@@ -143,3 +143,8 @@ export const options = {
 
 ---
 
+This version includes **Chocolatey and K6 installation steps**, keeps cloning and running tests simple, and explains token usage clearly.
+
+If you want, I can **also add a tiny “new endpoint template” section** at the bottom so any developer can just copy-paste to load test a new API quickly.
+
+Do you want me to add that?
