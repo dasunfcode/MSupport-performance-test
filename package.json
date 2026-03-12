@@ -1,0 +1,13 @@
+{
+  "name": "msupport-performance-test",
+  "version": "1.0.0",
+  "description": "K6-based load testing framework for MSupport API",
+  "scripts": {
+    "test:login": "k6 run tests/login-test.js",
+    "test:search": "k6 run tests/organizations-search-test.js",
+    "generate:tokens": "k6 run scripts/generate_tokens.js"
+  },
+  "devDependencies": {
+    "k6": "^0.43.1"
+  }
+}
