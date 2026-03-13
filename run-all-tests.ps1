@@ -3,6 +3,9 @@
 Run all k6 test scripts in random order, in parallel, and generate a combined HTML report.
 #>
 
+# Clean up any leftover HTML reports in the project folder
+Get-ChildItem -Path $PSScriptRoot -Filter "*.html" -File -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+
 $testFiles = @(
     "tests\create-tickets-test.js",
     "tests\login-test.js",
@@ -34,10 +37,11 @@ foreach ($testFile in $shuffledTests) {
             }
         }
 
-        # Generate a unique HTML report filename
+        # Generate a unique HTML report filename in the system temp directory
         $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
         $baseName = $($testFile -replace '.js','' -replace 'tests\\','')
-        $reportFile = "tests\$baseName-$timestamp.html"
+        $tempDir = [System.IO.Path]::GetTempPath()
+        $reportFile = Join-Path $tempDir "k6-report-$baseName-$timestamp.html"
 
         # Run k6 and generate HTML report
         $process = Start-Process -FilePath "k6" -ArgumentList "run `"$testFile`" -e K6_REPORT_FILE=`"$reportFile`"" -Wait -PassThru
@@ -101,7 +105,7 @@ th { background-color: #f2f2f2; }
 
 foreach ($file in $reportFiles) {
     if (Test-Path $file) {
-        $fileName = $file
+        $fileName = [System.IO.Path]::GetFileName($file)
         $timestamp = (Get-Item $file).LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
         $content = Get-Content -Path $file -Raw
 
@@ -124,6 +128,9 @@ foreach ($file in $reportFiles) {
     $tableHtml
 </div>
 "@
+
+        # Clean up the individual report file so nothing remains in the workspace
+        Remove-Item -Path $file -Force -ErrorAction SilentlyContinue
     }
 }
 
@@ -147,19 +154,15 @@ function downloadReport() {
 </html>
 "@
 
-$combinedHtml | Out-File -FilePath "combined-report.html" -Encoding UTF8
+# Write combined report to a temp file so the project folder stays clean
+$combinedReportPath = Join-Path ([System.IO.Path]::GetTempPath()) "combined-report-$((Get-Date).ToString('yyyyMMdd_HHmmss')).html"
+$combinedHtml | Out-File -FilePath $combinedReportPath -Encoding UTF8
 
-Write-Host "Combined report created: combined-report.html" -ForegroundColor Green
-
-# Optional: Delete individual report files
-foreach ($file in $reportFiles) {
-    Remove-Item $file -Force
-}
-Write-Host "Individual report files cleaned up." -ForegroundColor Cyan
+Write-Host "Combined report created: $combinedReportPath" -ForegroundColor Green
 
 # Open combined report automatically
 Write-Host "Opening combined report in browser..." -ForegroundColor Cyan
-Start-Process "combined-report.html"
+Start-Process $combinedReportPath
 
 # Exit with failure if any test failed
 if ($failedTests.Count -gt 0) {

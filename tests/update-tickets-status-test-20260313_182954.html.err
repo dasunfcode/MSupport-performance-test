@@ -1,8 +1,0 @@
-time="2026-03-13T18:29:56+05:30" level=info msg="TOKEN_1 generated for testuser56@example.com" source=console
-time="2026-03-13T18:29:57+05:30" level=info msg="TOKEN_2 generated for testuser35@example.com" source=console
-time="2026-03-13T18:29:57+05:30" level=info msg="TOKEN_3 generated for testuser34@example.com" source=console
-time="2026-03-13T18:29:58+05:30" level=info msg="TOKEN_4 generated for testuser9@example.com" source=console
-time="2026-03-13T18:29:59+05:30" level=info msg="TOKEN_5 generated for testuser14@example.com" source=console
-time="2026-03-13T18:29:59+05:30" level=info msg="Finished generating tokens for 5 users" source=console
-time="2026-03-13T18:29:59+05:30" level=info msg="Generated 5 tokens" source=console
-time="2026-03-13T18:30:30+05:30" level=error msg="failed to handle the end-of-test summary" error="handleSummary() should return a map with string keys"

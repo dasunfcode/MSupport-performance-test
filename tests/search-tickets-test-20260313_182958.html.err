@@ -1,9 +1,0 @@
-time="2026-03-13T18:29:59+05:30" level=warning msg="Error from API server" error="listen tcp 127.0.0.1:6565: bind: Only one usage of each socket address (protocol/network address/port) is normally permitted."
-time="2026-03-13T18:30:00+05:30" level=info msg="TOKEN_1 generated for testuser1@example.com" source=console
-time="2026-03-13T18:30:00+05:30" level=info msg="TOKEN_2 generated for testuser86@example.com" source=console
-time="2026-03-13T18:30:01+05:30" level=info msg="TOKEN_3 generated for testuser2@example.com" source=console
-time="2026-03-13T18:30:01+05:30" level=info msg="TOKEN_4 generated for testuser94@example.com" source=console
-time="2026-03-13T18:30:02+05:30" level=info msg="TOKEN_5 generated for testuser7@example.com" source=console
-time="2026-03-13T18:30:02+05:30" level=info msg="Finished generating tokens for 5 users" source=console
-time="2026-03-13T18:30:02+05:30" level=info msg="Generated 5 tokens" source=console
-time="2026-03-13T18:30:32+05:30" level=error msg="failed to handle the end-of-test summary" error="handleSummary() should return a map with string keys"
