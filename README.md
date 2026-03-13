@@ -1,4 +1,4 @@
-# MSupport Performance Tests
+# MSupport Load Tests
 
 A **k6-based test suite** to measure the performance of the MSupport API, covering login, ticket creation, searching, updating tickets, and more.
 
