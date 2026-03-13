@@ -1,100 +1,165 @@
 # MSupport Performance Tests
 
-This project uses k6 to test the MSupport API performance. It includes tests for login, creating tickets, searching, and more.
+A **k6-based test suite** to measure the performance of the MSupport API, covering login, ticket creation, searching, updating tickets, and more.
 
-## What You Need
+---
 
-- Windows computer
-- PowerShell
-- k6 (install with `choco install k6`)
+## Requirements
+
+* **Windows**
+* **PowerShell**
+* **k6** installed:
+
+```powershell
+choco install k6
+```
+
+---
 
 ## Quick Setup
 
-1. **Clone the repo:**
-   ```bash
-   git clone <your-repo-url>
-   cd MSupport-performance-test
-   ```
+1. **Clone the repository**
 
-2. **Create `.env` file:**
-   ```env
-   BASE_URL=https://qa.msupport.mone.am/api/v1
-   ```
+```bash
+git clone <your-repo-url>
+cd MSupport-performance-test
+```
 
-3. **Run tests:**
-   ```powershell
-   .\run-all-tests.ps1
-   ```
+2. **Create a `.env` file** in the project root:
 
-## How to Run Tests
+```env
+BASE_URL=https://qa.msupport.mone.am/api/v1
+```
 
-### Run All Tests
+3. **Run all tests**
+
 ```powershell
 .\run-all-tests.ps1
 ```
-This runs all tests at the same time in random order.
 
-### Run One Test
+---
+
+## Running Tests
+
+**Run all tests**:
+
+```powershell
+.\run-all-tests.ps1
+```
+
+**Run a single test**:
+
 ```powershell
 .\run-k6.ps1 run tests/create-tickets-test.js
 ```
 
-### Change Test Settings
+**Customize load** (VUs or duration):
+
 ```powershell
 .\run-k6.ps1 run -e VUS=20 -e DURATION=2m tests/login-test.js
 ```
 
-## Project Files
+---
 
+## Ramping Scenarios
+
+Some tests use **ramping** to simulate real-world traffic:
+
+```javascript
+export const options = {
+    scenarios: {
+        ramp_up: {
+            executor: 'ramping-vus',
+            startVUs: 1,
+            stages: [
+                { duration: '30s', target: 10 },
+                { duration: '1m', target: 50 },
+                { duration: '30s', target: 0 }
+            ]
+        }
+    }
+};
 ```
-MSupport-performance-test/
-├── .env                    # API URL settings
-├── run-k6.ps1             # Runs k6 with .env
-├── run-all-tests.ps1      # Runs all tests together
-├── scripts/
-│   ├── config.js          # Shared settings
-│   ├── generate_tokens.js # Login helper
-│   └── reportTemplate.js  # Report maker
-└── tests/
-    ├── create-tickets-test.js
-    ├── login-test.js
-    ├── organizations-search-test.js
-    ├── search-tickets-test.js
-    └── update-tickets-status-test.js
+
+---
+
+## Adding a New API Test
+
+1. **Create a new test** in `tests/`, e.g., `tests/new-endpoint-test.js`.
+2. **Import utilities**:
+
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+import { BASE_URL } from '../scripts/config.js';
+import { generateTokenPool } from '../scripts/generate_tokens.js';
 ```
+
+3. **Setup tokens** (if needed):
+
+```javascript
+export function setup() {
+    const tokens = generateTokenPool();
+    return { tokens };
+}
+```
+
+4. **Write test logic**:
+
+```javascript
+export default function (data) {
+    const token = data.tokens[__VU % data.tokens.length];
+    const headers = { Authorization: `Bearer ${token}` };
+
+    const res = http.get(`${BASE_URL}/new-endpoint`, { headers });
+    check(res, { 'status is 200': (r) => r.status === 200 });
+
+    sleep(Math.random() * 3);
+}
+```
+
+5. **Define test options**:
+
+```javascript
+export const options = {
+    vus: 10,
+    duration: '1m'
+};
+```
+
+6. **Add HTML report** (optional):
+
+```javascript
+import { handleSummary as summaryTemplate } from '../scripts/reportTemplate.js';
+
+export function handleSummary(data) {
+    return summaryTemplate(data, 'new-endpoint');
+}
+```
+
+7. **Include in `run-all-tests.ps1`** if desired.
+
+---
 
 ## Settings
 
-### Change API URL
-Edit `.env`:
+**Change API URL**:
+
 ```env
 BASE_URL=https://your-api-url.com/api/v1
 ```
 
-### Change Test Load
-In any test file, edit `options`:
+**Change test load** (per test or via CLI):
+
 ```javascript
-export const options = {
-    vus: 10,        // Number of users
-    duration: '1m'  // How long to run
-};
+export const options = { vus: 10, duration: '1m' };
 ```
 
-## Reports
+Override via CLI:
 
-After running tests, check:
-- `summary.html` - Web page with results
-- Console output - Basic info
+```powershell
+.\run-k6.ps1 run -e VUS=20 -e DURATION=2m tests/new-endpoint-test.js
+```
 
-## Common Issues
+---
 
-- **"k6 not found"** → Install k6: `choco install k6`
-- **API errors** → Check `BASE_URL` in `.env`
-- **Login fails** → Check user passwords in `scripts/generate_tokens.js`
-- **Tests slow** → Reduce `vus` in test options
-
-## Need Help?
-
-- Check the test files for examples
-- Look at `scripts/` for shared code
-- Run one test first to debug
