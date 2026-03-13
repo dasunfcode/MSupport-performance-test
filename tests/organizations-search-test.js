@@ -69,7 +69,8 @@ export default function (data) {
         'request successful': (r) => r.status === 201
     });
 
-    sleep(1);
+    // Random think time: 1-3 seconds to simulate realistic user behavior
+    sleep(Math.random() * 2 + 1);
 }
 
 export function handleSummary(data) {

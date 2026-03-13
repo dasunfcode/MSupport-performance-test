@@ -61,7 +61,8 @@ export default function (data) {
         'ticket updated successfully': (r) => r.status === 200
     });
 
-    sleep(1);
+    // Random think time: 1-3 seconds to simulate realistic user behavior
+    sleep(Math.random() * 2 + 1);
 }
 
 export function handleSummary(data) {

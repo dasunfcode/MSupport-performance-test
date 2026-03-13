@@ -1,144 +1,100 @@
----
+# MSupport Performance Tests
 
-# MSupport Load Test Framework
+This project uses k6 to test the MSupport API performance. It includes tests for login, creating tickets, searching, and more.
 
-A simple K6-based load testing framework for the MSupport API. Designed to simulate user logins and API requests under load.
+## What You Need
 
----
+- Windows computer
+- PowerShell
+- k6 (install with `choco install k6`)
 
-##  Quick Start
+## Quick Setup
 
-### 1. Install prerequisites
+1. **Clone the repo:**
+   ```bash
+   git clone <your-repo-url>
+   cd MSupport-performance-test
+   ```
 
-**Install Chocolatey (Windows)**
+2. **Create `.env` file:**
+   ```env
+   BASE_URL=https://qa.msupport.mone.am/api/v1
+   ```
 
-```powershell id="choco-install"
-Set-ExecutionPolicy Bypass -Scope Process -Force; `
-[System.Net.ServicePointManager]::SecurityProtocol = [System.Net.ServicePointManager]::SecurityProtocol -bor 3072; `
-iex ((New-Object System.Net.WebClient).DownloadString('https://community.chocolatey.org/install.ps1'))
+3. **Run tests:**
+   ```powershell
+   .\run-all-tests.ps1
+   ```
+
+## How to Run Tests
+
+### Run All Tests
+```powershell
+.\run-all-tests.ps1
+```
+This runs all tests at the same time in random order.
+
+### Run One Test
+```powershell
+.\run-k6.ps1 run tests/create-tickets-test.js
 ```
 
-**Install K6**
-
-```bash id="k6-install"
-choco install k6
+### Change Test Settings
+```powershell
+.\run-k6.ps1 run -e VUS=20 -e DURATION=2m tests/login-test.js
 ```
 
----
+## Project Files
 
-### 2. Clone the repository
-
-```bash id="repo-clone"
-git clone <repository-url>
-cd MSupport-performance-test
 ```
-
----
-
-### 3. Run basic tests
-
-```bash id="run-sample"
-k6 run sample.js
-k6 run tests/login-test.js
-```
-
-**Override options if needed:**
-
-```bash id="run-custom"
-k6 run -e VUS=50 -e DURATION=5m tests/organizations-search-test.js
-```
-
----
-
-##  Repository Structure
-
-```id="repo-structure"
 MSupport-performance-test/
-├── config/                  # Config files
-├── data/    
-├── scripts/                 # Token generation utilities
-├── tests/                   # Test scripts (login, search, etc.)
-├── sample.js                # Example K6 test
-└── README.md
+├── .env                    # API URL settings
+├── run-k6.ps1             # Runs k6 with .env
+├── run-all-tests.ps1      # Runs all tests together
+├── scripts/
+│   ├── config.js          # Shared settings
+│   ├── generate_tokens.js # Login helper
+│   └── reportTemplate.js  # Report maker
+└── tests/
+    ├── create-tickets-test.js
+    ├── login-test.js
+    ├── organizations-search-test.js
+    ├── search-tickets-test.js
+    └── update-tickets-status-test.js
 ```
 
----
+## Settings
 
-##  Token Management
-
-### How Tokens Work
-
-1. Test users are loaded from hardcoded test users.
-2. Each user logs in via `POST /auth/login`.
-3. Tokens (`access_token`) are extracted from response headers.
-4. Tokens are stored in a pool and reused in tests.
-
-### Use Tokens in Tests
-
-```javascript id="tokens-usage"
-export function setup() {
-    return generateTokenPool(users); // Generates token pool
-}
-
-export default function(tokens) {
-    const token = tokens[(__VU - 1) % tokens.length];
-    http.get(`${BASE_URL}/organizations`, {
-        headers: { Authorization: `Bearer ${token}` }
-    });
-}
+### Change API URL
+Edit `.env`:
+```env
+BASE_URL=https://your-api-url.com/api/v1
 ```
 
-### Generate Tokens Standalone
-
-```bash id="generate-tokens"
-k6 run scripts/generate_tokens.js
-```
-
----
-
-##  Adding New Tests
-
-1. Create a new file in `tests/`.
-2. Import modules:
-
-```javascript id="new-test-import"
-import http from 'k6/http';
-import { check } from 'k6';
-import { generateTokenPool } from '../scripts/generate_tokens.js';
-```
-
-3. Generate tokens in `setup()`.
-4. Implement API calls in `default()`.
-5. Add checks:
-
-```javascript id="new-test-check"
-check(res, { 'status is 200': (r) => r.status === 200 });
-```
-
----
-
-##  Customizing Load
-
-```javascript id="custom-load"
+### Change Test Load
+In any test file, edit `options`:
+```javascript
 export const options = {
-    vus: 10,
-    duration: '2m'
-};
-
-// Or ramping scenarios
-export const options = {
-    scenarios: {
-        ramp_up: {
-            executor: 'ramping-vus',
-            startVUs: 1,
-            stages: [
-                { duration: '30s', target: 10 },
-                { duration: '1m', target: 50 },
-                { duration: '30s', target: 0 }
-            ]
-        }
-    }
+    vus: 10,        // Number of users
+    duration: '1m'  // How long to run
 };
 ```
 
----
+## Reports
+
+After running tests, check:
+- `summary.html` - Web page with results
+- Console output - Basic info
+
+## Common Issues
+
+- **"k6 not found"** → Install k6: `choco install k6`
+- **API errors** → Check `BASE_URL` in `.env`
+- **Login fails** → Check user passwords in `scripts/generate_tokens.js`
+- **Tests slow** → Reduce `vus` in test options
+
+## Need Help?
+
+- Check the test files for examples
+- Look at `scripts/` for shared code
+- Run one test first to debug
