@@ -11,7 +11,6 @@ export const options = {
 };
 
 export function setup() {
-
     const tokens = generateTokenPool();
 
     if (!tokens.length) {
@@ -24,26 +23,23 @@ export function setup() {
 }
 
 export default function (data) {
-
     const tokens = data.tokens;
 
     // assign token per virtual user
     const token = tokens[__VU % tokens.length];
 
     const payload = JSON.stringify({
-        includeOCM: false,
-        query: "test",
-        offset: 0,
         limit: 20,
-        sortBy: "companyId",
+        offset: 0,
+        sortBy: "createdAt",
         sortOrder: "desc",
         filters: {
-            companyType: [],
-            country: [],
-            city: [],
-            timezone: [],
+            ticketType: ["problem"],
+            classificationType: [],
+            ticketPriority: [],
             status: [],
-            language: [],
+            creatorId: [],
+            assigneeId: [],
             createdAt: {
                 from: null,
                 to: null
@@ -60,13 +56,13 @@ export default function (data) {
     };
 
     const res = http.post(
-        `${BASE_URL}/organizations/search`,
+        `${BASE_URL}/tickets/search`,
         payload,
         params
     );
 
     check(res, {
-        'request successful': (r) => r.status === 201
+        'tickets search successful': (r) => r.status === 200
     });
 
     sleep(1);
@@ -74,5 +70,5 @@ export default function (data) {
 
 export function handleSummary(data) {
     // Pass a custom test name to the template
-    return summaryTemplate(data, "Search Organizations API");
+    return summaryTemplate(data, "Search Tickets API");
 }

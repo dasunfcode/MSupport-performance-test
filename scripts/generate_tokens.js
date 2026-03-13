@@ -1,6 +1,5 @@
 import http from 'k6/http';
-
-const BASE_URL = 'https://qa.msupport.mone.am/api/v1';
+import { BASE_URL } from './config.js';
 
 const users = [
   { email: "testuser1@example.com", password: "Test@1234" },
