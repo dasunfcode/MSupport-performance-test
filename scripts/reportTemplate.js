@@ -4,17 +4,28 @@
  * Generates a minimal HTML load test report with crucial metrics
  * @param {Object} data - k6 summary data
  * @param {string} testName - Optional name of the test / API
- * @returns {Object} - HTML only, with filename based on API name
+ * @returns {Object} - HTML only, with filename based on API name + timestamp
  */
 export function handleSummary(data, testName = "Load Test Summary") {
+
     // Metrics (safe fallback to 0)
     const httpReq = data.metrics.http_req_duration?.values ?? {};
     const totalReqs = data.metrics.http_reqs?.values?.count ?? 0;
     const failedReqs = data.metrics.http_req_failed?.values?.count ?? 0;
     const throughput = data.metrics.iterations?.values?.rate ?? 0;
 
-    // Sanitize testName for filename (remove spaces/special chars)
-    const safeFileName = testName.toLowerCase().replace(/\s+/g, '_').replace(/[^a-z0-9_]/g, '');
+    // Sanitize testName for filename
+    const safeFileName = testName
+        .toLowerCase()
+        .replace(/\s+/g, '_')
+        .replace(/[^a-z0-9_]/g, '');
+
+    // Create timestamp (YYYY-MM-DD_HH-MM-SS)
+    const now = new Date();
+    const timestamp = now.toISOString()
+        .replace("T", "_")
+        .replace(/:/g, "-")
+        .split(".")[0];
 
     // Build HTML
     const html = `
@@ -49,6 +60,6 @@ export function handleSummary(data, testName = "Load Test Summary") {
     </html>
     `;
 
-    // Return with dynamic filename based on API name
-    return { [`${safeFileName}.html`]: html };
+    // Filename example: login_test_2026-03-13_08-41-22.html
+    return { [`${safeFileName}_${timestamp}.html`]: html };
 }
