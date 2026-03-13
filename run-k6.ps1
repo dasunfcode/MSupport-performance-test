@@ -13,8 +13,16 @@ if (Test-Path $envFile) {
     if ($parts.Length -ne 2) { return }
     $name = $parts[0].Trim()
     $value = $parts[1].Trim()
-    if ($name) { $env:$name = $value }
+    if ($name) { Set-Item -Path "Env:$name" -Value $value }
   }
 }
 
+# Set flag for single test report
+$env:SINGLE_TEST = "1"
+
 k6 @Args
+
+# Open the report if it was generated
+if (Test-Path "report.html") {
+  Start-Process "report.html"
+}

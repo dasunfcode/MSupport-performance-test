@@ -1,0 +1,48 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Create Tickets API</title>
+        <style>
+            body { font-family: Arial, sans-serif; margin: 20px; }
+            h1 { text-align: center; color: #333; }
+            table { width: 50%; margin: 20px auto; border-collapse: collapse; }
+            th, td { border: 1px solid #ccc; padding: 10px; text-align: center; }
+            th { background-color: #f4f4f4; }
+            tr:nth-child(even) { background-color: #fafafa; }
+        </style>
+    </head>
+    <body>
+        <h1>Create Tickets API</h1>
+        <table>
+            <tr><th>Metric</th><th>Value</th></tr>
+            <tr><td>Total Requests</td><td>62</td></tr>
+            <tr><td>Failed Requests</td><td>0</td></tr>
+            <tr><td>Avg Response Time (ms)</td><td>392.55</td></tr>
+            <tr><td>Min Response Time (ms)</td><td>284.16</td></tr>
+            <tr><td>Max Response Time (ms)</td><td>1536.42</td></tr>
+            <tr><td>p50 (ms)</td><td>0</td></tr>
+            <tr><td>p90 (ms)</td><td>496.58</td></tr>
+            <tr><td>p95 (ms)</td><td>598.25</td></tr>
+            <tr><td>p99 (ms)</td><td>0</td></tr>
+            <tr><td>Throughput (req/sec)</td><td>1.51</td></tr>
+        </table>
+        <div style="text-align: center; margin: 20px;">
+            <button onclick="downloadReport()" style="padding: 10px 20px; background-color: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer;">Save Report</button>
+        </div>
+        <script>
+            function downloadReport() {
+                const html = document.documentElement.outerHTML;
+                const blob = new Blob([html], {type: 'text/html'});
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'report.html';
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        </script>
+    </body>
+    </html>
+    
