@@ -1,13 +1,6 @@
 import http from 'k6/http';
 import { BASE_URL } from './config.js';
-
-const users = [
-  { email: "testuser1@example.com", password: "Test@1234" },
-  { email: "testuser2@example.com", password: "Test@1234" },
-  { email: "testuser3@example.com", password: "Test@1234" },
-  { email: "testuser4@example.com", password: "Test@1234" },
-  { email: "testuser5@example.com", password: "Test@1234" }
-];
+import { users } from '../data/users.js';
 
 export function generateTokenPool(userList = users) {
 
