@@ -3,15 +3,7 @@ import { check, sleep } from 'k6';
 import { BASE_URL } from '../scripts/config.js';
 import { rampStages } from '../scripts/ramp-config.js';
 import { handleSummary as summaryTemplate } from '../scripts/reportTemplate.js';
-
-// Hardcoded test users
-const usersData = [
-  { email: "testuser1@example.com", password: "Test@1234" },
-  { email: "testuser2@example.com", password: "Test@1234" },
-  { email: "testuser3@example.com", password: "Test@1234" },
-  { email: "testuser4@example.com", password: "Test@1234" },
-  { email: "testuser5@example.com", password: "Test@1234" }
-];
+import { users } from '../data/users.js';
 
 export const options = {
     stages: rampStages
@@ -19,7 +11,7 @@ export const options = {
 
 export default function () {
     // Assign a user to each VU
-    const user = usersData[(__VU - 1) % usersData.length];
+    const user = users[(__VU - 1) % users.length];
 
     const payload = JSON.stringify({
         email: user.email,
@@ -41,11 +33,9 @@ export default function () {
 
     console.log(`VU ${__VU} logged in with ${user.email} - status: ${res.status}`);
 
-    // Random think time: 1-3 seconds to simulate realistic user behavior
     sleep(Math.random() * 2 + 1);
 }
 
 export function handleSummary(data) {
-    // Pass a custom test name to the template
     return summaryTemplate(data, "Login API");
 }

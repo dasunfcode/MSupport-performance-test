@@ -64,10 +64,8 @@ export function handleSummary(data, testName = "Load Test Summary") {
             <tr><td>Avg Response Time (ms)</td><td>${httpReq.avg?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Min Response Time (ms)</td><td>${httpReq.min?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Max Response Time (ms)</td><td>${httpReq.max?.toFixed(2) ?? 0}</td></tr>
-            <tr><td>p50 (ms)</td><td>${httpReq["p(50)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>p90 (ms)</td><td>${httpReq["p(90)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>p95 (ms)</td><td>${httpReq["p(95)"]?.toFixed(2) ?? 0}</td></tr>
-            <tr><td>p99 (ms)</td><td>${httpReq["p(99)"]?.toFixed(2) ?? 0}</td></tr>
             <tr><td>Throughput (req/sec)</td><td>${throughput?.toFixed(2) ?? 0}</td></tr>
         </table>
         <div style="text-align: center; margin: 20px;">
