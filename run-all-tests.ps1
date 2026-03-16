@@ -2,7 +2,13 @@ $testFiles = @(
     "tests\create-tickets-test.js",
     "tests\organizations-search-test.js",
     "tests\search-tickets-test.js",
-    "tests\update-tickets-status-test.js"
+    "tests\update-tickets-status-test.js",
+    "tests\assets-search-test.js",
+    "tests\assets-get-by-id-test.js",
+    "tests\assets-maintenances-test.js",
+    "tests\assets-mcare-packages-test.js",
+    "tests\assets-export-test.js",
+    "tests\assets-mcare-package-test.js"
 )
 
 $shuffledTests = $testFiles | Get-Random -Count $testFiles.Length
